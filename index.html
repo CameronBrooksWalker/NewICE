@@ -4,164 +4,263 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ICE UI Replica</title>
+
+<!-- Open source icons via CDN (no local files, your server can relax) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #cfd8dc;
-}
+body { margin:0; font-family:Tahoma, Arial; background:#cfd8dc; font-size:12px; }
 
 .header {
-  background: #8aa879;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
+  background: linear-gradient(#9bb88a,#7f9f6f);
+  padding:6px; display:flex; gap:10px; align-items:center;
 }
 
-.header button {
-  background: #dce775;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-}
+.toolbar-btn { text-align:center; width:60px; cursor:pointer; }
+.toolbar-btn i { display:block; font-size:16px; margin-bottom:2px; }
 
-.container {
-  display: flex;
-  height: calc(100vh - 50px);
-  gap: 5px;
-  padding: 5px;
-}
+.container { display:flex; height:calc(100vh - 50px); gap:6px; padding:6px; }
+.window { background:#e6e2d3; border:1px solid #888; display:flex; flex-direction:column; position:relative; }
+.titlebar { background:#d2c6a8; padding:4px 6px; font-weight:bold; border-bottom:1px solid #888; }
+.content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.panel { border-top:1px solid #aaa; padding:4px; overflow:auto; }
 
-.window {
-  background: #e0e0e0;
-  border: 1px solid #999;
-  display: flex;
-  flex-direction: column;
-}
+.left { width:36%; }
+.middle { width:24%; }
+.right { width:40%; }
 
-.titlebar {
-  background: #d7ccc8;
-  padding: 5px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-}
+.resizer { width:5px; cursor:col-resize; background:#aaa; }
 
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+.table { width:100%; border-collapse:collapse; }
+.table th { background:#4f81bd; color:#fff; cursor:pointer; }
+.table th, .table td { border:1px solid #999; padding:3px; }
+.table tr:nth-child(even){ background:#f4f4f4; }
 
-.panel {
-  border-top: 1px solid #999;
-  padding: 5px;
-  overflow: auto;
-}
+.email-preview { white-space:pre-wrap; font-family:Consolas, monospace; }
 
-.left { width: 35%; }
-.middle { width: 30%; }
-.right { width: 35%; }
+.small-toolbar { display:flex; gap:4px; margin-bottom:4px; }
+.small-toolbar i { width:18px; text-align:center; cursor:pointer; }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
+/* fake spinner */
+.spinner {
+  display:none;
+  position:absolute; inset:0;
+  background:rgba(255,255,255,0.6);
+  align-items:center; justify-content:center;
 }
+.spinner i { font-size:30px; animation:spin 1s linear infinite; }
+@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
 
-.table th, .table td {
-  border: 1px solid #aaa;
-  padding: 4px;
+/* context menu */
+.context-menu {
+  position:absolute; display:none;
+  background:#fff; border:1px solid #888;
+  z-index:999; font-size:12px;
 }
+.context-menu div { padding:5px 10px; cursor:pointer; }
+.context-menu div:hover { background:#eee; }
 
-.email-preview {
-  font-size: 12px;
-  white-space: pre-wrap;
-}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <button>Service</button>
-  <button>Sales</button>
-  <button>Shop</button>
-  <button>Work Order</button>
-  <button>Customers</button>
-  <button>Vendors</button>
-  <button>Dashboard</button>
-  <button>Logout</button>
+  <div class="toolbar-btn"><i class="fa fa-wrench"></i>Service</div>
+  <div class="toolbar-btn"><i class="fa fa-chart-line"></i>Sales</div>
+  <div class="toolbar-btn"><i class="fa fa-industry"></i>Shop</div>
+  <div class="toolbar-btn"><i class="fa fa-clipboard"></i>Work</div>
+  <div class="toolbar-btn"><i class="fa fa-users"></i>Customers</div>
+  <div class="toolbar-btn"><i class="fa fa-truck"></i>Vendors</div>
+  <div class="toolbar-btn"><i class="fa fa-gauge"></i>Dashboard</div>
+  <div class="toolbar-btn"><i class="fa fa-sign-out-alt"></i>Logout</div>
 </div>
 
-<div class="container">
+<div class="container" id="container">
 
-  <!-- LEFT WINDOW -->
-  <div class="window left">
-    <div class="titlebar">ICE - Dashboard</div>
-    <div class="content">
-      <div class="panel">
-        <strong>Calendar</strong>
+<div class="window left">
+  <div class="spinner"><i class="fa fa-spinner"></i></div>
+  <div class="titlebar">ICE - Dashboard</div>
+  <div class="content">
+
+    <div class="panel"><b>Calendar</b></div>
+
+    <div class="panel">
+      <b>Messages</b>
+      <div class="small-toolbar">
+        <i class="fa fa-plus"></i>
+        <i class="fa fa-edit"></i>
+        <i class="fa fa-trash"></i>
       </div>
-      <div class="panel">
-        <strong>Messages</strong>
-        <table class="table">
-          <tr><th>From</th><th>Subject</th></tr>
-          <tr><td>Samantha</td><td>Mobility Account</td></tr>
-          <tr><td>Jason</td><td>Prize drawing</td></tr>
-        </table>
-      </div>
-      <div class="panel">
-        <strong>Email Preview</strong>
-        <div class="email-preview">
-From: Hunter
+      <table class="table" id="msgTable">
+        <thead>
+          <tr><th onclick="sortTable(0,'msgTable')">From</th><th onclick="sortTable(1,'msgTable')">Subject</th></tr>
+        </thead>
+        <tbody>
+<tr><td>Samantha</td><td>Mobility Account</td></tr>
+<tr><td>Jason</td><td>Prize drawing</td></tr>
+<tr><td>Angela</td><td>Thank you</td></tr>
+<tr><td>Mike</td><td>Follow-up on quote</td></tr>
+<tr><td>Chris</td><td>Meeting notes</td></tr>
+<tr><td>Laura</td><td>Updated pricing</td></tr>
+<tr><td>Ben</td><td>Quick question</td></tr>
+<tr><td>Rachel</td><td>Invoice attached</td></tr>
+<tr><td>Steve</td><td>Project update</td></tr>
+<tr><td>Olivia</td><td>Schedule change</td></tr>
+<tr><td>Daniel</td><td>Reminder</td></tr>
+<tr><td>Emma</td><td>New request</td></tr>
+<tr><td>Ryan</td><td>Status check</td></tr>
+<tr><td>Chloe</td><td>Draft review</td></tr>
+<tr><td>Victor</td><td>Budget approval</td></tr>
+<tr><td>Nina</td><td>Travel plans</td></tr>
+<tr><td>Tom</td><td>System alert</td></tr>
+<tr><td>Grace</td><td>Feedback</td></tr>
+<tr><td>Henry</td><td>Updated docs</td></tr>
+<tr><td>Ava</td><td>Call summary</td></tr>
+</tbody>
+      </table>
+    </div>
+
+    <div class="panel email-preview">From: Hunter
 Subject: AT&T Business
 
 Good afternoon,
-Here are the notes and pricing...
-        </div>
-      </div>
+Here are the notes and pricing...</div>
+
+  </div>
+</div>
+
+<div class="resizer" onmousedown="initResize(event)"></div>
+
+<div class="window middle">
+  <div class="titlebar">Mail Folders</div>
+  <div class="content">
+    <div class="panel">
+      <ul>
+        <li>Inbox</li>
+        <li>Sent</li>
+        <li>Drafts</li>
+        <li>Archive</li>
+      </ul>
     </div>
   </div>
+</div>
 
-  <!-- MIDDLE WINDOW -->
-  <div class="window middle">
-    <div class="titlebar">Mail Folders</div>
-    <div class="content">
-      <div class="panel">
-        <ul>
-          <li>Inbox</li>
-          <li>Sent</li>
-          <li>Outbox</li>
-          <li>Drafts</li>
-        </ul>
+<div class="resizer" onmousedown="initResize(event)"></div>
+
+<div class="window right" oncontextmenu="showMenu(event)">
+  <div class="spinner"><i class="fa fa-spinner"></i></div>
+  <div class="titlebar">Emails</div>
+  <div class="content">
+
+    <div class="panel">
+      <div class="small-toolbar">
+        <i class="fa fa-reply"></i>
+        <i class="fa fa-forward"></i>
+        <i class="fa fa-trash"></i>
       </div>
+      <table class="table" id="emailTable">
+        <thead>
+          <tr><th onclick="sortTable(0,'emailTable')">From</th><th onclick="sortTable(1,'emailTable')">Subject</th></tr>
+        </thead>
+        <tbody>
+<tr><td>Samantha</td><td>Mobility Account</td></tr>
+<tr><td>Jason</td><td>Prize drawing</td></tr>
+<tr><td>Angela</td><td>Thank you</td></tr>
+<tr><td>Mike</td><td>Follow-up on quote</td></tr>
+<tr><td>Chris</td><td>Meeting notes</td></tr>
+<tr><td>Laura</td><td>Updated pricing</td></tr>
+<tr><td>Ben</td><td>Quick question</td></tr>
+<tr><td>Rachel</td><td>Invoice attached</td></tr>
+<tr><td>Steve</td><td>Project update</td></tr>
+<tr><td>Olivia</td><td>Schedule change</td></tr>
+<tr><td>Daniel</td><td>Reminder</td></tr>
+<tr><td>Emma</td><td>New request</td></tr>
+<tr><td>Ryan</td><td>Status check</td></tr>
+<tr><td>Chloe</td><td>Draft review</td></tr>
+<tr><td>Victor</td><td>Budget approval</td></tr>
+<tr><td>Nina</td><td>Travel plans</td></tr>
+<tr><td>Tom</td><td>System alert</td></tr>
+<tr><td>Grace</td><td>Feedback</td></tr>
+<tr><td>Henry</td><td>Updated docs</td></tr>
+<tr><td>Ava</td><td>Call summary</td></tr>
+</tbody>
+      </table>
     </div>
-  </div>
 
-  <!-- RIGHT WINDOW -->
-  <div class="window right">
-    <div class="titlebar">Emails</div>
-    <div class="content">
-      <div class="panel">
-        <table class="table">
-          <tr><th>From</th><th>Subject</th></tr>
-          <tr><td>Stephen</td><td>Re: ??</td></tr>
-          <tr><td>Betty</td><td>Rubber supplier</td></tr>
-        </table>
-      </div>
-      <div class="panel email-preview">
-Hi Michael,
+    <div class="panel email-preview">Hi Michael,
 
 We are offering a promotion...
 
 Best regards,
-Stephen
-      </div>
-    </div>
+Stephen</div>
+
   </div>
+</div>
 
 </div>
+
+<!-- context menu -->
+<div class="context-menu" id="menu">
+  <div onclick="fakeAction()">Open</div>
+  <div onclick="fakeAction()">Reply</div>
+  <div onclick="fakeAction()">Delete</div>
+</div>
+
+<script>
+function sortTable(col, id) {
+  const t = document.getElementById(id);
+  const rows = Array.from(t.tBodies[0].rows);
+  const asc = t.dataset.sort !== 'asc';
+  rows.sort((a,b)=>{
+    return asc
+      ? a.cells[col].innerText.localeCompare(b.cells[col].innerText)
+      : b.cells[col].innerText.localeCompare(a.cells[col].innerText);
+  });
+  rows.forEach(r=>t.tBodies[0].appendChild(r));
+  t.dataset.sort = asc ? 'asc':'desc';
+}
+
+// resizable panes
+let currentResizer;
+function initResize(e){
+  currentResizer = e.target;
+  document.onmousemove = resize;
+  document.onmouseup = ()=>document.onmousemove=null;
+}
+function resize(e){
+  const prev = currentResizer.previousElementSibling;
+  const next = currentResizer.nextElementSibling;
+  const dx = e.movementX;
+  prev.style.width = (prev.offsetWidth + dx) + 'px';
+  next.style.width = (next.offsetWidth - dx) + 'px';
+}
+
+// fake loading
+function fakeLoad(el){
+  const s = el.querySelector('.spinner');
+  s.style.display='flex';
+  setTimeout(()=>s.style.display='none',1000);
+}
+
+// context menu
+function showMenu(e){
+  e.preventDefault();
+  const m = document.getElementById('menu');
+  m.style.display='block';
+  m.style.left = e.pageX+'px';
+  m.style.top = e.pageY+'px';
+}
+
+document.onclick = ()=> document.getElementById('menu').style.display='none';
+
+function fakeAction(){ alert('Action completed. Probably.'); }
+
+// trigger fake loading randomly for realism
+setInterval(()=>{
+  const wins = document.querySelectorAll('.window');
+  fakeLoad(wins[Math.floor(Math.random()*wins.length)]);
+},5000);
+</script>
 
 </body>
 </html>
